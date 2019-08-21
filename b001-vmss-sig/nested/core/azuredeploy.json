@@ -2,7 +2,15 @@
     "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
     "contentVersion": "1.0.0.0",
     "parameters": {
-        "demoLocation": {}
+        "galleryName": {
+            "type": "string"
+        },
+        "images": {
+            "type": "object"
+        },
+        "versions": {
+            "type": "object"
+        }
     },
     "variables": {
         "_artifactsLocation": "https://raw.githubusercontent.com/bennbatt8112/AzureDemos/master/b001-vmss-sig/core/",
@@ -16,28 +24,85 @@
             "name": "galleryDeployment",
             "type": "Microsoft.Resources/deployments",
             "apiVersion": "2019-05-01",
-            "location": "[parameters('demoLocation')]",
             "properties": {
-              "template": {},
-              "templateLink": {
-                "uri": "string",
-                "contentVersion": "string"
-              },
-              "parameters": {},
-              "parametersLink": {
-                "uri": "string",
-                "contentVersion": "string"
-              },
-              "mode": "string",
-              "debugSetting": {
-                "detailLevel": "string"
-              },
-              "onErrorDeployment": {
-                "type": "string",
-                "deploymentName": "string"
-              }
+                "templateLink": {
+                    "uri": "[variables('galleryUri')]"
+                },
+                "parameters": {
+                    "galleryName": {
+                        "value": "[parameters('galleryName')]"
+                    }
+                },
+                "mode": "incremental"
             }
-          }
+        },
+        {
+            "name": "[concat('imageDeployment-',parameters('images')[copyIndex()].name)]",
+            "type": "Microsoft.Resources/deployments",
+            "apiVersion": "2019-05-01",
+            "dependsOn": [
+                "galleryDeployment"
+            ],
+            "copy": {
+                "name": "imageLoop",
+                "count": "[length(parameters('images'))]"
+            },
+            "properties": {
+                "templateLink": {
+                    "uri": "[variables('imageUri')]"
+                },
+                "parameters": {
+                    "galleryName": {
+                        "value": "[parameters('galleryName')]"
+                    },
+                    "imageName": {
+                        "value": "[parameters('images')[copyIndex()].name]"
+                    },
+                    "osType": {
+                        "value": "[parameters('images')[copyIndex()].osType]"
+                    },
+                    "identifier": {
+                        "value": "[parameters('images')[copyIndex()].identifier]"
+                    }
+                },
+                "mode": "incremental"
+            }
+        },
+        {
+            "name": "[concat('versionDeployment-',parameters('versions')[copyIndex()].imageName,'-',parameters('versions')[copyIndex()].versionName)]",
+            "type": "Microsoft.Resources/deployments",
+            "apiVersion": "2019-05-01",
+            "dependsOn": [
+                "[resourceId('Microsoft.Compute/galleries/images',parameters('versions')[copyIndex()].galleryName,parameters('versions').imageName)]"
+            ],
+            "copy": {
+                "name": "versionLoop",
+                "count": "[length(parameters('versions'))]"
+            },
+            "properties": {
+                "templateLink": {
+                    "uri": "[variables('versionUri')]"
+                },
+                "parameters": {
+                    "galleryName": {
+                        "value": "[parameters('versions')[copyIndex()].galleryName]"
+                    },
+                    "imageName": {
+                        "value": "[parameters('versions')[copyIndex()].imageName]"
+                    },
+                    "version": {
+                        "value": "[parameters('versions')[copyIndex()].name]"
+                    },
+                    "targetRegions": {
+                        "value": "[parameters('versions')[copyIndex()].targetRegions]"
+                    },
+                    "imageId": {
+                        "value": "[parameters('versions')[copyIndex()].imageId]"
+                    }
+                },
+                "mode": "incremental"
+            }
+        }
     ],
     "outputs": {}
 }
