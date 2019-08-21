@@ -6,10 +6,12 @@
             "type": "string"
         },
         "images": {
-            "type": "object"
+            "type": "array",
+            "defaultValue": []
         },
         "versions": {
-            "type": "object"
+            "type": "array",
+            "defaultValue": []
         }
     },
     "variables": {
@@ -37,6 +39,7 @@
             }
         },
         {
+            "condition": "[not(equals(length(parameters('images')),0))]",
             "name": "[concat('imageDeployment-',parameters('images')[copyIndex()].name)]",
             "type": "Microsoft.Resources/deployments",
             "apiVersion": "2019-05-01",

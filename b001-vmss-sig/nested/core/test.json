@@ -1,0 +1,40 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentParameters.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "galleryName": {
+            "value": "mytestgallery2"
+        },
+        "images": {
+            "value": [
+                {
+                    "name": "mytestimage1",
+                    "osType": "Linux",
+                    "identifier": {
+                        "publisher": "bennbatt8112",
+                        "offer": "sampleLinux",
+                        "sku": "primarySku"
+                    }
+                },
+                {
+                    "name": "mytestimage2",
+                    "osType": "Linux",
+                    "identifier": {
+                        "publisher": "bennbatt8112",
+                        "offer": "sampleLinux",
+                        "sku": "secondarySku"
+                    }
+                },
+                {
+                    "name": "mytestimage3",
+                    "osType": "Windows",
+                    "identifier": {
+                        "publisher": "bennbatt8112",
+                        "offer": "sampleWindows",
+                        "sku": "testSku"
+                    }
+                }
+            ]
+        }
+    }
+}
