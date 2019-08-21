@@ -1,0 +1,101 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2018-05-01/subscriptionDeploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "namingPrefix": {
+            "type": "string",
+            "defaultValue": "b001"
+        },
+        "demoLocation": {
+            "type": "string",
+            "defaultValue": "westus2",
+            "metadata": {
+                "description": "The Azure region to deploy auxiliary resources to."
+            },
+            "allowedValues": [
+                "eastus",
+                "eastus2",
+                "southcentralus",
+                "westus",
+                "westus2",
+                "centralus",
+                "northcentralus",
+                "westcentralus"
+            ]
+        },
+        "appLocations": {
+            "type": "array",
+            "defaultValue": [
+                "westus2"
+            ],
+            "metadata": {
+                "description": "The regions to deploy the application into."
+            }
+        }
+    },
+    "variables": {
+        "_artifactsLocation": "https://raw.githubusercontent.com/bennbatt8112/AzureDemos/master/b001-vmss-sig/",
+        "regionMap": {
+            "eastus": "eus",
+            "eastus2": "eus2",
+            "southcentralus": "scus",
+            "westus": "wus",
+            "westus2": "wus2",
+            "centralus": "cus",
+            "northcentralus": "ncus",
+            "westcentralus": "wcus"
+        },
+        "coreRGName": "[concat(parameters('namingPrefix'),'-core-rg')]",
+        "coreUri": "[concat(variables('_artifactsLocation'),'/nested/core/azuredeploy.json')]"
+    },
+    "functions": [],
+    "resources": [
+        {
+            "name": "[variables('coreRGName')]",
+            "type": "Microsoft.Resources/resourceGroups",
+            "apiVersion": "2018-05-01",
+            "location": "[parameters('demoLocation')]",
+            "tags": {
+                "CreatedBy": "Bennett Battistoni"
+            },
+            "properties": {}
+        },
+        {
+            "name": "[concat(parameters('namingPrefix'),'-app-',variables('regionMap')[parameters('appLocations')[copyIndex()]],'-rg')]",
+            "type": "Microsoft.Resources/resourceGroups",
+            "apiVersion": "2018-05-01",
+            "copy": {
+                "name": "appRGloop",
+                "count": "[length(parameters('appLocations'))]"
+            },
+            "location": "[parameters('appLocations')[copyIndex()]]",
+            "tags": {
+                "CreatedBy": "Bennett Battistoni"
+            },
+            "properties": {}
+        },
+        {
+            "name": "coreDeployment",
+            "type": "Microsoft.Resources/deployments",
+            "apiVersion": "2019-05-01",
+            "subscriptionId": "[subscription().id]",
+            "resourceGroup": "[variables('coreRGName')]",
+            "dependsOn": [
+                "[variables('coreRGName')]"
+            ],
+            "location": "[parameters('demoLocation')]",
+            "properties": {                
+                "templateLink": {
+                    "uri": "[variables('coreUri')]"
+                },
+                "parameters": {},
+                "parametersLink": {
+                    "uri": "string",
+                    "contentVersion": "string"
+                },
+                "mode": "incremental"
+            }
+        }
+    ],
+    "outputs": {}
+}

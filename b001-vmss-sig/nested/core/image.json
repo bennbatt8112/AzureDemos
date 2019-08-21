@@ -1,0 +1,51 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "galleryName": {
+            "type": "string"
+        },
+        "imageName": {
+            "type": "string"
+        },
+        "osType": {
+            "type": "string",
+            "allowedValues": [
+                "Windows",
+                "Linux"
+            ],
+            "defaultValue": "Linux"
+        },
+        "identifier": {
+            "type": "object",
+            "metadata": {
+                "description": "This image identifier object requires a publisher, offer, and sku."
+            },
+            "defaultValue": {
+                "publisher": "bennbatt8112",
+                "offer": "sampleOffer",
+                "sku": "[uniqueString(newGuid())]"
+            }
+        }
+    },
+    "variables": {},
+    "functions": [],
+    "resources": [
+        {
+            "name": "[concat(parameters('galleryName'),'/',parameters('imageName'))]",
+            "type": "Microsoft.Compute/galleries/images",
+            "apiVersion": "2019-03-01",
+            "location": "[resourceGroup().location]",
+            "tags": {
+                "CreatedBy": "Bennett Battistoni"
+            },
+            "properties": {
+                "description": "Sample description of the image to be deployed.",
+                "osType": "[parameters('osType')]",
+                "osState": "Generalized",
+                "identifier": "[parameters('identifier')]"
+            }
+        }
+    ],
+    "outputs": {}
+}

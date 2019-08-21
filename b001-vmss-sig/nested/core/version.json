@@ -1,0 +1,69 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "galleryName": {
+            "type": "string"
+        },
+        "imageName": {
+            "type": "string"
+        },
+        "version": {
+            "type": "string",
+            "metadata": {
+                "description": "The version of the image you are uploading. Must take form X.Y.Z"
+            },
+            "defaultValue": "1.0.0"   
+        },
+        "targetRegions": {
+            "type": "array",
+            "metadata": {
+                "description": "The list of Azure regions to replicate this image into."
+            },
+            "defaultValue": [
+                "[resourceGroup().location]"
+            ]
+        },
+        "imageId": {
+            "type": "string",
+            "metadata": {
+                "description": "The resource Id of the managed image to import into the Shared Image Gallery."
+            }
+        }
+    },
+    "variables": {
+        "storageAccountType": "Standard_LRS",
+        "replicaCount": 1
+    },
+    "functions": [],
+    "resources": [
+        {
+            "name": "[concat(parameters('galleryName'),'/',parameters('imageName'),'/',parameters('version'))]",
+            "type": "Microsoft.Compute/galleries/images/versions",
+            "apiVersion": "2019-03-01",
+            "location": "[resourceGroup().location]",
+            "tags": {
+                "CreatedBy": "Bennett Battistoni"
+            },
+            "properties": {
+                "publishingProfile": {
+                    "copy": [{
+                        "name": "targetRegions",
+                        "count": "[length(parameters('targetRegions'))]",
+                        "input": {
+                            "name": "[parameters('targetRegions')[copyIndex('targetRegions')]]",
+                            "regionalReplicaCount": "[variables('replicaCount')]"
+                        }
+                    }],
+                    "source": {
+                        "managedImage": {
+                            "id": "[parameters('imageId')]"
+                        }
+                    },
+                    "storageAccountType": "[variables('storageAccountType')]"
+                }
+            }
+        }
+    ],
+    "outputs": {}
+}

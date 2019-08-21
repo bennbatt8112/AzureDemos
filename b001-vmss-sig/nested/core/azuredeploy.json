@@ -1,0 +1,43 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "demoLocation": {}
+    },
+    "variables": {
+        "_artifactsLocation": "https://raw.githubusercontent.com/bennbatt8112/AzureDemos/master/b001-vmss-sig/core/",
+        "galleryUri": "[concat(variables('_artifactsLocation'),'gallery.json')]",
+        "imageUri": "[concat(variables('_artifactsLocation'),'image.json')]",
+        "versionUri": "[concat(variables('_artifactsLocation'),'version.json')]"
+    },
+    "functions": [],
+    "resources": [
+        {
+            "name": "galleryDeployment",
+            "type": "Microsoft.Resources/deployments",
+            "apiVersion": "2019-05-01",
+            "location": "[parameters('demoLocation')]",
+            "properties": {
+              "template": {},
+              "templateLink": {
+                "uri": "string",
+                "contentVersion": "string"
+              },
+              "parameters": {},
+              "parametersLink": {
+                "uri": "string",
+                "contentVersion": "string"
+              },
+              "mode": "string",
+              "debugSetting": {
+                "detailLevel": "string"
+              },
+              "onErrorDeployment": {
+                "type": "string",
+                "deploymentName": "string"
+              }
+            }
+          }
+    ],
+    "outputs": {}
+}
