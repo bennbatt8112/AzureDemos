@@ -39,7 +39,7 @@
             }
         },
         {
-            "condition": "[not(equals(length(parameters('images')),0))]",
+            "condition": "[if(equals(length(parameters('images')),0),bool('false'),bool('true'))]",
             "name": "[concat('imageDeployment-',parameters('images')[copyIndex()].name)]",
             "type": "Microsoft.Resources/deployments",
             "apiVersion": "2019-05-01",
@@ -72,6 +72,7 @@
             }
         },
         {
+            "condition": "[if(equals(length(parameters('versions')),0),bool('false'),bool('true'))]",
             "name": "[concat('versionDeployment-',parameters('versions')[copyIndex()].imageName,'-',parameters('versions')[copyIndex()].versionName)]",
             "type": "Microsoft.Resources/deployments",
             "apiVersion": "2019-05-01",
