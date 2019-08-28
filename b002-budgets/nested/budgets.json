@@ -1,0 +1,120 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "costCenterBudgets": {
+            "type": "array",
+            "metadata": {
+                "description": "Array of key value pairs of CostCenter codes and their associated budgets in USD/Month."
+            },
+            "defaultValue": [
+                {
+                    "costCenter": "",
+                    "amount": 25
+                }
+            ]
+        },
+        "firstNotificationThreshold": {
+            "type": "int",
+            "minValue": 0,
+            "maxValue": 100,
+            "defaultValue": 80
+        },
+        "upperLimitThreshold": {
+            "type": "int",
+            "minValue": 95,
+            "defaultValue": 100
+        },
+        "hardLimit": {
+            "type": "bool",
+            "metadata": {
+                "description": "Boolean value to set hard limits and enable cost control measures"
+            },
+            "defaultValue": false
+        },
+        "emailsToNotify": {
+            "type": "array",
+            "metadata": {
+                "description": "List of email addresses to be contacted for notifications."
+            },
+            "defaultValue": [
+                "azureadmin@contoso.com"
+            ]
+        },
+        "rolesToNotify": {
+            "type": "array",
+            "metadata": {
+                "description": "List of ARM Roles to be contacted for notifications."
+            },
+            "defaultValue": [
+                "Owner"
+            ]
+        },
+        "actionGroupsToNotify": {
+            "type": "array",
+            "metadata": {
+                "description": "List of action groups to trigger upon hard limit reached."
+            },
+            "defaultValue": []
+        },
+        "startDate": {
+            "type": "string",
+            "metadata": {
+                "description": "Today's date in YYYY-MM-DD format."
+            },
+            "minLength": 10,
+            "maxLength": 10,
+            "defaultValue": "2019-08-01"
+        }
+    },
+    "variables": {},
+    "resources": [
+        {
+            "name": "[concat('costcenter-',parameters('costCenterBudgets')[copyIndex()].costCenter,'-budget')]",
+            "type": "Microsoft.Consumption/budgets",
+            "copy": {
+                "count": "[length(parameters('costCenterBudgets'))]",
+                "name": "costCenterLoop"
+            },
+            "location": "global",
+            "apiVersion": "2019-01-01",
+            "properties": {
+                "category": "Cost",
+                "amount": "[parameters('costCenterBudgets')[copyIndex()].amount]",
+                "timeGrain": "Monthly",
+                "timePeriod": {
+                    "startDate": "[parameters('startDate')]"
+                },
+                "filters": {
+                    "tags": {
+                        "costCenter": "[parameters('costCenterBudgets')[copyIndex()].costCenter]"
+                    }
+                },
+                "notifications": {
+                    "ApproachingBudget": {
+                        "contactEmails": "[parameters('emailsToNotify')]",
+                        "enabled": true,
+                        "operator": "GreaterThanOrEqualTo",
+                        "threshold": "[parameters('firstNotificationThreshold')]"
+                    },
+                    "BudgetReached": {
+                        "contactEmails": "[parameters('emailsToNotify')]",
+                        "contactRoles": "[parameters('rolesToNotify')]",
+                        "enabled": true,
+                        "operator": "GreaterThanOrEqualTo",
+                        "threshold": 100
+                    },
+                    "LimitReached": {
+                        "contactEmails": "[parameters('emailsToNotify')]",
+                        "contactGroups": "[parameters('actionGroupsToNotify')]",
+                        "contactRoles": "[parameters('rolesToNotify')]",
+                        "enabled": "[parameters('hardLimit')]",
+                        "operator": "GreaterThanOrEqualTo",
+                        "threshold": "[parameters('upperLimitThreshold')]"
+                    }
+                }
+            }
+        }
+    ],
+    "outputs": {}
+}

@@ -1,0 +1,109 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2018-05-01/subscriptionDeploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "namingPrefix": {
+           "type": "string",
+           "metadata": {
+                "description": "Prefix for resource naming"
+            },
+            "defaultValue": "b002"
+        },
+        "demoLocation": {
+            "type": "string",
+            "metadata": {
+                "description": "Azure location to store resources."
+            },
+            "defaultValue": "westus2"
+        },
+        "shutdownVMs": {
+            "type": "bool",
+            "defaultValue": true
+        },
+        "optimizeStorageTier": {
+            "type": "bool",
+            "defaultValue": true
+        }
+    },
+    "variables": {
+        "_artifactsLocation": "https://raw.githubusercontent.com/bennbatt8112/AzureDemos/master/b002-budgets/",
+        "regionMap": {
+            "eastus": "eus",
+            "eastus2": "eus2",
+            "southcentralus": "scus",
+            "westus": "wus",
+            "westus2": "wus2",
+            "centralus": "cus",
+            "northcentralus": "ncus",
+            "westcentralus": "wcus"
+        },
+        "naming": {
+            "rgName": "[concat(parameters('namingPrefix'),'-budgets-rg')]"
+        }
+    },
+    "functions": [],
+    "resources": [
+        {
+            "name": "[variables('naming').rgName]",
+            "type": "Microsoft.Resources/resourceGroups",
+            "apiVersion": "2018-05-01",
+            "location": "[parameters('demoLocation')]",
+            "tags": {
+                "CreatedBy": "Bennett Battistoni"
+            },
+            "properties": {}
+        },
+        {
+            "name": "automationDeployment",
+            "type": "Microsoft.Resources/deployments",
+            "apiVersion": "2016-09-01",
+            "resourceGroup": "[variables('naming').rgName]",
+            "dependsOn": [
+                "[variables('naming').rgName]"
+            ],
+            "properties": {
+                "mode": "Incremental",
+                "templateLink": {
+                    "uri": "[concat(variables('_artifactsLocation'), '/nested/automationAccount.json')]",
+                    "contentVersion": "1.0.0.0"
+                },
+                "parameters": {}
+            }
+        },
+        {
+            "name": "actionGroupDeployment",
+            "type": "Microsoft.Resources/deployments",
+            "apiVersion": "2016-09-01",
+            "resourceGroup": "[variables('naming').rgName]",
+            "dependsOn": [
+                "automationDeployment"
+            ],
+            "properties": {
+                "mode": "Incremental",
+                "templateLink": {
+                    "uri": "[concat(variables('_artifactsLocation'), '/nested/actionGroups.json')]",
+                    "contentVersion": "1.0.0.0"
+                },
+                "parameters": {}
+            }
+        },
+        {
+            "name": "budgetsDeployment",
+            "type": "Microsoft.Resources/deployments",
+            "apiVersion": "2016-09-01",
+            "resourceGroup": "[variables('naming').rgName]",
+            "dependsOn": [
+                "actionGroupsDeployment"
+            ],
+            "properties": {
+                "mode": "Incremental",
+                "templateLink": {
+                    "uri": "[concat(variables('_artifactsLocation'), '/nested/budgets.json')]",
+                    "contentVersion": "1.0.0.0"
+                },
+                "parameters": {}
+            }
+        }           
+    ],
+    "outputs": {}
+}

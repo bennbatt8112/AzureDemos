@@ -1,0 +1,9 @@
+{
+    "$schema": "https://aka.ms/azure-quickstart-templates-metadata-schema#",
+    "type": "QuickStart",
+    "itemDisplayName": "sample-demo",
+    "description": "This is just a demo folder",
+    "summary": "Nothing will deploy from this",
+    "githubUsername": "bennbatt8112",
+    "dateUpdated": "2019-08-20"
+}
