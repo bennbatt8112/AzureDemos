@@ -1,9 +1,9 @@
 {
     "$schema": "https://aka.ms/azure-quickstart-templates-metadata-schema#",
     "type": "QuickStart",
-    "itemDisplayName": "sample-demo",
-    "description": "This is just a demo folder",
-    "summary": "Nothing will deploy from this",
+    "itemDisplayName": "b003-arm-rollback",
+    "description": "This demo show cases a rollback deployment via arm",
+    "summary": "Deploys a virtual network, then deploys a secondary vnet with a misconfiguration and rolls back the deployment",
     "githubUsername": "bennbatt8112",
     "dateUpdated": "2019-08-20"
 }
