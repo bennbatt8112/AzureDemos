@@ -1,68 +1,38 @@
 {
     "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
     "contentVersion": "1.0.0.0",
-    "parameters": {
-        "deploymentName": {
-            "type": "string"
-        },
-        "rollbackName": {
-            "type": "string",
-            "defaultValue": "networking-v1.0"
-        }
-    },
+    "parameters": {},
     "variables": {},
     "functions": [],
     "resources": [
         {
-            "name": "[parameters('deploymentName')]",
-            "type": "Microsoft.Resources/deployments",
-            "apiVersion": "2016-09-01",
+            "name": "virtualNetwork1",
+            "type": "Microsoft.Network/virtualNetworks",
+            "apiVersion": "2018-08-01",
+            "location": "[resourceGroup().location]",
+            "tags": {
+                "displayName": "virtualNetwork1"
+            },
             "properties": {
-                "mode": "Incremental",
-                "template": {
-                    "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
-                    "contentVersion": "1.0.0.0",
-                    "parameters": {},
-                    "variables": {},
-                    "resources": [
-                        {
-                            "name": "virtualNetwork1",
-                            "type": "Microsoft.Network/virtualNetworks",
-                            "apiVersion": "2018-08-01",
-                            "location": "[resourceGroup().location]",
-                            "tags": {
-                                "displayName": "virtualNetwork1"
-                            },
-                            "properties": {
-                                "addressSpace": {
-                                    "addressPrefixes": [
-                                        "10.0.0.0/16"
-                                    ]
-                                },
-                                "subnets": [
-                                    {
-                                        "name": "Subnet-1",
-                                        "properties": {
-                                            "addressPrefix": "10.0.0.0/24"
-                                        }
-                                    },
-                                    {
-                                        "name": "Subnet-2",
-                                        "properties": {
-                                            "addressPrefix": "10.0.1.0/24"
-                                        }
-                                    }
-                                ]
-                            }
-                        }
-                    ],
-                    "outputs": {},
-                    "onErrorDeployment": {
-                        "type": "SpecificDeployment",
-                        "deploymentName": "[parameters('rollbackName')]"
-                    }
+                "addressSpace": {
+                    "addressPrefixes": [
+                        "10.0.0.0/16"
+                    ]
                 },
-                "parameters": {}
+                "subnets": [
+                    {
+                        "name": "Subnet-1",
+                        "properties": {
+                            "addressPrefix": "10.0.0.0/24"
+                        }
+                    },
+                    {
+                        "name": "Subnet-2",
+                        "properties": {
+                            "addressPrefix": "10.0.1.0/24"
+                        }
+                    }
+                ]
             }
         }
     ],

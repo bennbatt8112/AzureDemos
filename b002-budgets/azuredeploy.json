@@ -16,13 +16,25 @@
             },
             "defaultValue": "westus2"
         },
-        "shutdownVMs": {
+        "optimizeCompute": {
             "type": "bool",
             "defaultValue": true
         },
-        "optimizeStorageTier": {
+        "computeExceptions": {
+            "type": "array",
+            "metadata": {
+                "description": "Exception list to ensure critical VMs and Disks are not modified."
+            }
+        },
+        "optimizeStorage": {
             "type": "bool",
             "defaultValue": true
+        },
+        "storageExceptions" :{
+            "type": "array",
+            "metadata": {
+                "description": "Exception list to ensure critical storage accounts are not modified."
+            }
         }
     },
     "variables": {
@@ -54,7 +66,7 @@
             "properties": {}
         },
         {
-            "name": "automationDeployment",
+            "name": "functionDeployment",
             "type": "Microsoft.Resources/deployments",
             "apiVersion": "2016-09-01",
             "resourceGroup": "[variables('naming').rgName]",
@@ -64,7 +76,7 @@
             "properties": {
                 "mode": "Incremental",
                 "templateLink": {
-                    "uri": "[concat(variables('_artifactsLocation'), '/nested/automationAccount.json')]",
+                    "uri": "[concat(variables('_artifactsLocation'), '/nested/functions.json')]",
                     "contentVersion": "1.0.0.0"
                 },
                 "parameters": {}
@@ -76,7 +88,7 @@
             "apiVersion": "2016-09-01",
             "resourceGroup": "[variables('naming').rgName]",
             "dependsOn": [
-                "automationDeployment"
+                "functionDeployment"
             ],
             "properties": {
                 "mode": "Incremental",
